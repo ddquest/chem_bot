@@ -60,6 +60,6 @@ png_binary = encoder.to_png()
 Before run the bot, set config files.
 
 - `twitter.config`
-- `twitter.token`
+    - rename `twitter.config.template` and set vars.
 
 Then, run a script `bin/run_twitter_client.py` .
