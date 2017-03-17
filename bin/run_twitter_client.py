@@ -67,9 +67,9 @@ class Listner(tweepy.StreamListener):
         if encoder.mol is None:
             print('Encoding error for [ {0} ]'.format(smiles))
             tweet += (
-                u' すまない。どうやらこのSMILESは上手く変換できなかったようだ。')
+                u' すまない。このSMILESは上手く変換できなかったようだ。')
             tweet += '"{0}"'.format(smiles)
-            api.update_status(tweet)
+            api.update_status(self.string_trimmer(tweet))
 
         png_binary = encoder.to_png()
         image = tempfile.TemporaryFile()
@@ -77,8 +77,15 @@ class Listner(tweepy.StreamListener):
         image.seek(0)
         api.update_with_media(
             filename='{0}.png'.format(smiles),
-            status=tweet,
+            status=self.string_trimmer(tweet),
             file=image)
+
+    def string_trimmer(self, line):
+        """Wrap end of strings to under 140 characters."""
+        if len(line) > 140:
+            return line[:137] + '...'
+        else:
+            return line
 
 
 def _main():
