@@ -1,3 +1,8 @@
+[general]
+;command_prefix
+;  e.g., @chem_tes smiles: 
+command_prefix = 
+
 [tokens]
 ;Twitter apps API tokens and consumer key
 CONSUMER_KEY = 

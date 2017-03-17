@@ -1,5 +1,7 @@
 # ignore files on chem_bot
 ipynb/
+.envrc
+twitter.config
 
 ### https://raw.github.com/github/gitignore/9ef1596ac14f77ddd79a74e3f621ee117022e107/python.gitignore
 
