@@ -58,7 +58,11 @@ class Listner(tweepy.StreamListener):
             command = str(status.text).lstrip(self.command_prefix).lstrip(' ')
             smiles, option_d = self.parse_tweet_command(command)
             self.reply_with_png(
-                api, smiles, status.author.screen_name, option_d=option_d)
+                api,
+                smiles,
+                status.id,
+                status.author.screen_name,
+                option_d=option_d)
         return True
 
     def parse_tweet_command(self, command):
@@ -75,7 +79,7 @@ class Listner(tweepy.StreamListener):
         option_d = dict([re.split(r': *', x) for x in options])
         return smiles, option_d
 
-    def reply_with_png(self, api, smiles, screen_name, option_d=None):
+    def reply_with_png(self, api, smiles, s_id, screen_name, option_d=None):
         """Tweet chem graph to user"""
         print('smiles: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
@@ -85,7 +89,7 @@ class Listner(tweepy.StreamListener):
         else:
             tweet += u' おや、SMILESに使えない文字が入っているようだ。'
             try:
-                api.update_status(self.string_trimmer(tweet))
+                api.update_status(self.string_trimmer(tweet), s_id)
             except tweepy.error.TweepError as e:
                 print('Error: {0}'.format(e))
             return False
@@ -96,7 +100,7 @@ class Listner(tweepy.StreamListener):
                 u' すまない。このSMILESは上手く変換できなかったようだ。')
             tweet += '"{0}"'.format(smiles)
             try:
-                api.update_status(self.string_trimmer(tweet))
+                api.update_status(self.string_trimmer(tweet), s_id)
             except tweepy.error.TweepError as e:
                 print('Error: {0}'.format(e))
             return False
@@ -109,6 +113,7 @@ class Listner(tweepy.StreamListener):
             api.update_with_media(
                 filename='{0}.png'.format(smiles),
                 status=self.string_trimmer(tweet),
+                in_reply_to_status_id=s_id,
                 file=image)
         except Exception as e:
             print(e)
