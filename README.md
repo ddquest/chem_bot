@@ -13,7 +13,7 @@ Prepare conda environment.
 
 ```
 cd chem_bot
-conda create -n chem_bot -f environment.yml
+conda env create -n chem_bot -f environment.yml
 ```
 
 Activate conda environment.
@@ -27,7 +27,7 @@ Install `chem_bot`.
 Run pip command at `chem_bot` directory.
 
 ```
-pip install ./
+python setup.py install
 ```
 
 ## Usage
