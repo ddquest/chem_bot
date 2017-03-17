@@ -128,3 +128,17 @@ Temporary Items
 .apdisk
 
 
+### https://raw.github.com/github/gitignore/8512c772d731ce256f81da49e627d293274fab8a/Global/vim.gitignore
+
+# swap
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
+
+
