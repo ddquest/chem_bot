@@ -55,30 +55,55 @@ class Listner(tweepy.StreamListener):
         self.command_prefix = self.command_prefix
         if str(status.text).startswith(self.command_prefix):
             smiles = str(status.text).lstrip(self.command_prefix)
-            self.reply(api, smiles, status.author.screen_name)
+            self.reply_with_png(api, smiles, status.author.screen_name)
         return True
 
-    def reply(self, api, smiles, screen_name):
+    def reply_with_png(self, api, smiles, screen_name):
         """Tweet chem graph to user"""
         print('smiles: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
 
-        encoder = SmilesEncoder(smiles)
+        if self.check_ascii(smiles):
+            encoder = SmilesEncoder(smiles)
+        else:
+            tweet += u' おや、SMILESに使えない文字が入っているようだ。'
+            try:
+                api.update_status(self.string_trimmer(tweet))
+            except tweepy.error.TweepError as e:
+                print('Error: {0}'.format(e))
+            return False
+
         if encoder.mol is None:
             print('Encoding error for [ {0} ]'.format(smiles))
             tweet += (
                 u' すまない。このSMILESは上手く変換できなかったようだ。')
             tweet += '"{0}"'.format(smiles)
-            api.update_status(self.string_trimmer(tweet))
+            try:
+                api.update_status(self.string_trimmer(tweet))
+            except tweepy.error.TweepError as e:
+                print('Error: {0}'.format(e))
+            return False
 
         png_binary = encoder.to_png()
         image = tempfile.TemporaryFile()
         image.write(png_binary)
         image.seek(0)
-        api.update_with_media(
-            filename='{0}.png'.format(smiles),
-            status=self.string_trimmer(tweet),
-            file=image)
+        try:
+            api.update_with_media(
+                filename='{0}.png'.format(smiles),
+                status=self.string_trimmer(tweet),
+                file=image)
+        except Exception as e:
+            print(e)
+        return True
+
+    def check_ascii(self, smiles):
+        """Except multibyte characters in strings."""
+        try:
+            smiles.encode('ascii')
+            return True
+        except UnicodeEncodeError:
+            return False
 
     def string_trimmer(self, line):
         """Wrap end of strings to under 140 characters."""
