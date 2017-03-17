@@ -1,4 +1,5 @@
 import configparser
+import re
 import tempfile
 import textwrap
 import time
@@ -54,11 +55,27 @@ class Listner(tweepy.StreamListener):
         self.command_prefix = config.get('general', 'command_prefix')
         self.command_prefix = self.command_prefix
         if str(status.text).startswith(self.command_prefix):
-            smiles = str(status.text).lstrip(self.command_prefix)
-            self.reply_with_png(api, smiles, status.author.screen_name)
+            command = str(status.text).lstrip(self.command_prefix).lstrip(' ')
+            smiles, option_d = self.parse_tweet_command(command)
+            self.reply_with_png(
+                api, smiles, status.author.screen_name, option_d=option_d)
         return True
 
-    def reply_with_png(self, api, smiles, screen_name):
+    def parse_tweet_command(self, command):
+        """Parse command into SMILES and options.
+
+        If command not has any options, return (smiles, None)
+        """
+        try:
+            smiles, trail_line = re.split(r',[ ]*| +', command, maxsplit=1)
+        except ValueError:
+            return command, None
+
+        options = re.split(r', *', trail_line)
+        option_d = dict([re.split(r': *', x) for x in options])
+        return smiles, option_d
+
+    def reply_with_png(self, api, smiles, screen_name, option_d=None):
         """Tweet chem graph to user"""
         print('smiles: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
