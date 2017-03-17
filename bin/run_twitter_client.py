@@ -53,11 +53,12 @@ class Listner(tweepy.StreamListener):
         super().__init__(api)
 
     def on_status(self, status):
-        print('[catch] id: {0} >>> {1}'.format(status.id, status.text))
-
         self.command_prefix = config.get('general', 'command_prefix')
         self.command_prefix = self.command_prefix
         if str(status.text).startswith(self.command_prefix):
+            print(
+                '[CATCH] @{0} >>> {1}'
+                .format(status.author.screen_name, status.text))
             command = str(status.text).lstrip(self.command_prefix).lstrip(' ')
             smiles, option_d = self.parse_tweet_command(command)
             self.reply_with_png(
@@ -66,6 +67,7 @@ class Listner(tweepy.StreamListener):
                 status.id,
                 status.author.screen_name,
                 option_d=option_d)
+        print('[BOT] continue streaming...')
         return True
 
     def parse_tweet_command(self, command):
@@ -84,7 +86,7 @@ class Listner(tweepy.StreamListener):
 
     def reply_with_png(self, api, smiles, s_id, screen_name, option_d=None):
         """Tweet chem graph to user"""
-        print('smiles: {0}'.format(smiles))
+        print('[SMILES]: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
 
         if self.check_ascii(smiles):
@@ -143,8 +145,8 @@ def _main():
     global api
     api, config = get_config()
     oauth(api.auth)
-    print('OAuth [ OK ]')
-    print('start streaming...')
+    print('[BOT] OAuth is OK')
+    print('[BOT] start streaming...')
     stream = tweepy.Stream(api.auth, Listner(), secure=True)
     while True:
         try:
