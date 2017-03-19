@@ -59,7 +59,7 @@ class Listner(tweepy.StreamListener):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
-            command = str(status.text).lstrip(self.command_prefix).lstrip(' ')
+            command = status.text.split(self.command_prefix)[1].lstrip(' ')
             smiles, option_d = self.parse_tweet_command(command)
             self.reply_with_png(
                 api,
