@@ -89,26 +89,22 @@ class Listner(tweepy.StreamListener):
         print('[SMILES]: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
 
+        if smiles == '':
+            tweet += u'SMILESを入力し忘れていないか確認してもらえないだろうか。'
+            return self.tweet_error_message(tweet, s_id)
+
         if self.check_ascii(smiles):
             encoder = SmilesEncoder(smiles)
         else:
             tweet += u' おや、SMILESに使えない文字が入っているようだ。'
-            try:
-                api.update_status(self.string_trimmer(tweet), s_id)
-            except tweepy.error.TweepError as e:
-                print('Error: {0}'.format(e))
-            return False
+            return self.tweet_error_message(tweet, s_id)
 
         if encoder.mol is None:
             print('Encoding error for [ {0} ]'.format(smiles))
             tweet += (
                 u' すまない。このSMILESは上手く変換できなかったようだ。')
             tweet += '"{0}"'.format(smiles)
-            try:
-                api.update_status(self.string_trimmer(tweet), s_id)
-            except tweepy.error.TweepError as e:
-                print('Error: {0}'.format(e))
-            return False
+            return self.tweet_error_message(tweet, s_id)
 
         png_binary = encoder.to_png()
         image = tempfile.TemporaryFile()
@@ -123,6 +119,13 @@ class Listner(tweepy.StreamListener):
         except Exception as e:
             print(e)
         return True
+
+    def tweet_error_message(self, tweet, s_id):
+            try:
+                api.update_status(self.string_trimmer(tweet), s_id)
+            except tweepy.error.TweepError as e:
+                print('Error: {0}'.format(e))
+            return False
 
     def check_ascii(self, smiles):
         """Except multibyte characters in strings."""
