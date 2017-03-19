@@ -67,7 +67,7 @@ class Listner(tweepy.StreamListener):
                 status.id,
                 status.author.screen_name,
                 option_d=option_d)
-        print('[BOT] continue streaming...')
+            print('[BOT] continue streaming...')
         return True
 
     def parse_tweet_command(self, command):
