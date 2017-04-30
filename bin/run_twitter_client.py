@@ -8,6 +8,7 @@ import textwrap
 import time
 import tweepy
 
+import chem_bot
 from chem_bot import SmilesEncoder
 
 
@@ -51,11 +52,31 @@ class Listner(tweepy.StreamListener):
     """Streaming time-line."""
     def __init__(self, api=None):
         super().__init__(api)
+        self.iupac_prefix = config.get('general', 'iupac_prefix')
+        self.smiles_prefix = config.get('general', 'smiles_prefix')
+        self.opsin = config.get('general', 'opsin')
 
     def on_status(self, status):
-        self.command_prefix = config.get('general', 'command_prefix')
-        self.command_prefix = self.command_prefix
-        if str(status.text).startswith(self.command_prefix):
+        print(status.text)
+        if str(status.text).startswith(self.iupac_prefix):
+            print(
+                '[CATCH] @{0} >>> {1}'
+                .format(status.author.screen_name, status.text))
+            command = status.text.split(self.iupac_prefix)[1].lstrip(' ')
+            iupac, option_d = self.parse_tweet_command(command)
+            smiles = chem_bot.util.converter.iupac_to_smiles(iupac, self.opsin)
+            if smiles == '':
+                self.tweet_error_message(status.id, status.author.screen_name)
+            self.reply_with_png(
+                api,
+                smiles,
+                status.id,
+                status.author.screen_name,
+                option_d=option_d,
+                from_iupac=True)
+            print('[BOT] continue streaming...')
+
+        if str(status.text).startswith(self.smiles_prefix):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
@@ -68,41 +89,53 @@ class Listner(tweepy.StreamListener):
                 status.author.screen_name,
                 option_d=option_d)
             print('[BOT] continue streaming...')
+
         return True
 
     def parse_tweet_command(self, command):
-        """Parse command into SMILES and options.
+        """Parse command into SMILES/IUPAC and options.
 
-        If command not has any options, return (smiles, None)
+        If command not has any options, return (smile/iupac, None)
         """
         try:
-            smiles, trail_line = re.split(r',[ ]*| +', command, maxsplit=1)
+            discriptor, trail_line = re.split(r',[ ]*| +', command, maxsplit=1)
         except ValueError:
             return command, None
 
         options = re.split(r', *', trail_line)
         option_d = dict([re.split(r': *', x) for x in options])
-        return smiles, option_d
+        return discriptor, option_d
 
-    def reply_with_png(self, api, smiles, s_id, screen_name, option_d=None):
+    def reply_iupac_convert_error(self, s_id, screen_name):
+        """Tweet for reply about iupac convert error."""
+        print('[IUPAC] convert error')
+        return self.tweet_error_message(
+            'IUPACからSMILESへの変換に失敗したようだ。', s_id)
+
+    def reply_with_png(self, api, smiles,
+                       s_id, screen_name, option_d=None,
+                       descriptor_type='SMILES'):
         """Tweet chem graph to user"""
         print('[SMILES]: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
 
         if smiles == '':
-            tweet += u'SMILESを入力し忘れていないか確認してもらえないだろうか。'
+            tweet += (
+                '{0}を入力し忘れていないか確認してもらえないだろうか。'
+                .format(descriptor_type))
             return self.tweet_error_message(tweet, s_id)
 
         if self.check_ascii(smiles):
             encoder = SmilesEncoder(smiles)
         else:
-            tweet += u' おや、SMILESに使えない文字が入っているようだ。'
+            tweet += ' おや、SMILESに使えない文字が入っているようだ。'
             return self.tweet_error_message(tweet, s_id)
 
         if encoder.mol is None:
             print('Encoding error for [ {0} ]'.format(smiles))
             tweet += (
-                u' すまない。このSMILESは上手く変換できなかったようだ。')
+                ' すまない。この{0}は上手く変換できなかったようだ。'
+                .format(descriptor_type))
             tweet += '"{0}"'.format(smiles)
             return self.tweet_error_message(tweet, s_id)
 
