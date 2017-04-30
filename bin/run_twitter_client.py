@@ -57,30 +57,35 @@ class Listner(tweepy.StreamListener):
         self.opsin = config.get('general', 'opsin')
 
     def on_status(self, status):
-        print(status.text)
         if str(status.text).startswith(self.iupac_prefix):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
-            command = status.text.split(self.iupac_prefix)[1].lstrip(' ')
-            iupac, option_d = self.parse_tweet_command(command)
-            smiles = chem_bot.util.converter.iupac_to_smiles(iupac, self.opsin)
+            iupac = status.text.split(self.iupac_prefix)[1].lstrip(' ')
+            if self.check_ascii(iupac):
+                smiles, error = chem_bot.util.converter.iupac_to_smiles(
+                    iupac, self.opsin)
+            else:
+                smiles = ''
+                error = iupac
+
             if smiles == '':
-                self.tweet_error_message(status.id, status.author.screen_name)
-            self.reply_with_png(
-                api,
-                smiles,
-                status.id,
-                status.author.screen_name,
-                option_d=option_d,
-                from_iupac=True)
+                self.reply_iupac_convert_error(error, status.id)
+                print('[BOT] Error: {0}'.format(error))
+            else:
+                self.reply_with_png(
+                    api,
+                    smiles,
+                    status.id,
+                    status.author.screen_name,
+                    descriptor_type='IUPAC名')
             print('[BOT] continue streaming...')
 
         if str(status.text).startswith(self.smiles_prefix):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
-            command = status.text.split(self.command_prefix)[1].lstrip(' ')
+            command = status.text.split(self.smiles_prefix)[1].lstrip(' ')
             smiles, option_d = self.parse_tweet_command(command)
             self.reply_with_png(
                 api,
@@ -106,11 +111,12 @@ class Listner(tweepy.StreamListener):
         option_d = dict([re.split(r': *', x) for x in options])
         return discriptor, option_d
 
-    def reply_iupac_convert_error(self, s_id, screen_name):
+    def reply_iupac_convert_error(self, error, s_id):
         """Tweet for reply about iupac convert error."""
-        print('[IUPAC] convert error')
+        print('[BOT] IUPAC conversion error')
         return self.tweet_error_message(
-            'IUPACからSMILESへの変換に失敗したようだ。', s_id)
+            'すまない。私の化学目録に「{0}」という文字は無かった。'
+            .format(error), s_id)
 
     def reply_with_png(self, api, smiles,
                        s_id, screen_name, option_d=None,
