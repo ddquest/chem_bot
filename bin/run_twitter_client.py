@@ -70,7 +70,8 @@ class Listner(tweepy.StreamListener):
                 error = iupac
 
             if smiles == '':
-                self.reply_iupac_convert_error(error, status.id)
+                self.reply_iupac_convert_error(
+                    error, status.id, status.author.screen_name)
                 print('[BOT] Error: {0}'.format(error))
             else:
                 self.reply_with_png(
@@ -111,11 +112,12 @@ class Listner(tweepy.StreamListener):
         option_d = dict([re.split(r': *', x) for x in options])
         return discriptor, option_d
 
-    def reply_iupac_convert_error(self, error, s_id):
+    def reply_iupac_convert_error(self, error, s_id, screen_name):
         """Tweet for reply about iupac convert error."""
         print('[BOT] IUPAC conversion error')
+        tweet = '@{0} '.format(screen_name)
         return self.tweet_error_message(
-            'すまない。私の化学目録に「{0}」という文字は無かった。'
+            tweet + 'すまない。私の化学目録に「{0}」という文字は無かった。'
             .format(error), s_id)
 
     def reply_with_png(self, api, smiles,
