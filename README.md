@@ -63,3 +63,15 @@ Before run the bot, set config files.
     - rename `twitter.config.template` and set vars.
 
 Then, run a script `bin/run_twitter_client.py` .
+
+### Use OPSIN IUPAC name to SMILES conversion
+
+Download [OPSIN](https://bitbucket.org/dan2097/opsin) to convert IUPAC name to SMILES.
+
+```
+cd java/
+sh get_opsin.sh
+```
+
+> Lowe, D. M., Corbett, P. T., Murray-Rust, P., & Glen, R. C. (2011). Chemical name to structure: OPSIN, an open source solution.
+> http://pubs.acs.org/doi/abs/10.1021/ci100384d
