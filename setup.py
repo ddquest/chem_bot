@@ -12,7 +12,7 @@ install_requires = [str(req.req) for req in reqs]
 
 setup(
     name='chem_bot',
-    version='0.99',
+    version='1.1',
     description='Cheminfo bot',
     author='kubor',
     packages=find_packages(),
