@@ -85,7 +85,8 @@ class Listner(tweepy.StreamListener):
                     smiles,
                     status.id,
                     status.author.screen_name,
-                    descriptor_type='IUPAC名')
+                    descriptor_type='IUPAC名',
+                    with_smiles=True)
             print('[BOT] continue streaming...')
 
         if str(status.text).startswith(self.smiles_prefix):
@@ -128,7 +129,7 @@ class Listner(tweepy.StreamListener):
 
     def reply_with_png(self, api, smiles,
                        s_id, screen_name, option_d=None,
-                       descriptor_type='SMILES'):
+                       descriptor_type='SMILES', with_smiles=False):
         """Tweet chem graph to user"""
         print('[SMILES]: {0}'.format(smiles))
         tweet = '@{0}'.format(screen_name)
@@ -157,6 +158,10 @@ class Listner(tweepy.StreamListener):
         image = tempfile.TemporaryFile()
         image.write(png_binary)
         image.seek(0)
+
+        if with_smiles:
+            tweet = '{0} "{1}"'.format(tweet, smiles)
+
         try:
             api.update_with_media(
                 filename='{0}.png'.format(smiles),
