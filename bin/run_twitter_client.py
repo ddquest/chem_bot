@@ -12,16 +12,22 @@ import chem_bot
 from chem_bot import SmilesEncoder
 
 
-def oauth(auth):
+__CONFIG_FILE__ = 'twitter.config'
+
+
+def oauth(auth, config):
     if auth.access_token == '':
         try:
             redirect_url = auth.get_authorization_url()
             print('Get authorized PIN code from url.')
             print(redirect_url)
-            pin = input('PIN:')
+            pin = input('PIN: ')
             auth.get_access_token(pin)
-            print('access_token:', auth.access_token)
-            print('access_token_secret:', auth.access_token_secret)
+            config.set('tokens', 'access_token', auth.access_token)
+            config.set(
+                'tokens', 'access_token_secret', auth.access_token_secret)
+            with open(__CONFIG_FILE__, 'w') as f:
+                config.write(f)
             return auth
         except tweepy.TweepError:
             raise Exception(textwrap.dedent("""\
@@ -38,7 +44,7 @@ def _tweet_test(api, smiles, screen_name):
 
 def get_config():
     config = configparser.ConfigParser()
-    config.read('twitter.config')
+    config.read(__CONFIG_FILE__)
     auth = tweepy.OAuthHandler(
         config.get('tokens', 'consumer_key'),
         config.get('tokens', 'consumer_secret'))
@@ -188,7 +194,7 @@ def _main():
     global config
     global api
     api, config = get_config()
-    oauth(api.auth)
+    oauth(api.auth, config)
     print('[BOT] OAuth is OK')
     print('[BOT] start streaming...')
     stream = tweepy.Stream(api.auth, Listner(), secure=True)
