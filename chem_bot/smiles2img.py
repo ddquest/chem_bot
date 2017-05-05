@@ -31,8 +31,8 @@ class SmilesEncoder(object):
         elif encode_type == 'png':
             drawer = Draw.MolDraw2DCairo(width, height)
 
-        drawer.FinishDrawing()
         drawer.DrawMolecule(self.mol)
+        drawer.FinishDrawing()
         self.canvas = drawer.GetDrawingText()
         self.encode_type = encode_type
         return self.canvas
