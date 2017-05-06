@@ -11,4 +11,6 @@ ENV LC_ALL=C
 RUN python setup.py install && \
     (cd java/ && sh get_opsin.sh)
 
-CMD ["python", "-u", "/chem_bot/bin/run_twitter_client.py"]
+RUN apk add openjdk8
+
+CMD ["python", "-u", "bin/run_twitter_client.py"]
