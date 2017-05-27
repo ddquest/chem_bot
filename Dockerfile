@@ -11,6 +11,7 @@ ENV LC_ALL=C
 RUN python setup.py install && \
     (cd java/ && sh get_opsin.sh)
 
-RUN apk add openjdk8
+RUN apk update && \
+    apk --no-cache add openjdk8
 
 CMD ["python", "-u", "bin/run_twitter_client.py"]
