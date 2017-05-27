@@ -15,6 +15,10 @@ smiles_prefix = %(bot_id)s smiles:
 ; e.g., java/opsin.jar
 opsin = java/opsin.jar
 
+;hashtag
+; e.g., #souyakuchan_magic
+hashtag = 
+
 [tokens]
 ;Twitter apps API tokens and consumer key
 CONSUMER_KEY = 
