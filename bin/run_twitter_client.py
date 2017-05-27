@@ -61,6 +61,8 @@ class Listner(tweepy.StreamListener):
         self.iupac_prefix = config.get('general', 'iupac_prefix')
         self.smiles_prefix = config.get('general', 'smiles_prefix')
         self.opsin = config.get('general', 'opsin')
+        self.hashtag = config.get('general', 'hashtag')
+        self.hashtag_len = len(self.hashtag)
 
     def on_status(self, status):
         if str(status.text).startswith(self.iupac_prefix):
@@ -165,7 +167,7 @@ class Listner(tweepy.StreamListener):
         try:
             api.update_with_media(
                 filename='{0}.png'.format(smiles),
-                status=self.string_trimmer(tweet),
+                status=self.add_hashtag(tweet),
                 in_reply_to_status_id=s_id,
                 file=image)
         except Exception as e:
@@ -193,6 +195,13 @@ class Listner(tweepy.StreamListener):
             return line[:137] + '...'
         else:
             return line
+
+    def add_hashtag(self, line):
+        """Add Twitter hashtag after line."""
+        if len(line) + self.hashtag_len + 1 > 140:
+            return line[:-self.hashtag_len+4] + '... ' + self.hashtag
+        else:
+            return line + ' ' + self.hashtag
 
 
 def _main():
