@@ -115,7 +115,8 @@ class Listner(tweepy.StreamListener):
         try:
             discriptor, trail_line = re.split(r',[ ]*| +', command, maxsplit=1)
         except ValueError:
-            return command, None
+            discriptor = command.replace('\n', '').replace('\r', '')
+            return discriptor, None
 
         options = re.split(r', *', trail_line)
         option_d = dict([re.split(r': *', x) for x in options])
