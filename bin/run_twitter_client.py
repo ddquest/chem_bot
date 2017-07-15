@@ -69,7 +69,9 @@ class Listner(tweepy.StreamListener):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
-            iupac = status.text.split(self.iupac_prefix)[1].lstrip(' ')
+            iupac = status.text.split(
+                self.iupac_prefix)[1] \
+                .lstrip(' ').replace('\n', '').replace('\r', '')
             if self.check_ascii(iupac):
                 smiles, error = chem_bot.util.converter.iupac_to_smiles(
                     iupac, self.opsin)
