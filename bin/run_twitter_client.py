@@ -66,7 +66,10 @@ class Listner(tweepy.StreamListener):
 
     def on_status(self, status):
         command_prefix = status.text.split(':')[0]
-        if str(command_prefix.lower()).startswith(self.iupac_prefix):
+        reply_users = (
+            [status.author.screen_name] +
+            self.get_mention_users(status._json))
+        if str(command_prefix.lower()).find(self.iupac_prefix) != -1:
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
@@ -82,19 +85,19 @@ class Listner(tweepy.StreamListener):
 
             if smiles == '':
                 self.reply_iupac_convert_error(
-                    error, status.id, status.author.screen_name)
+                    error, status.id, reply_users)
                 print('[BOT] Error: {0}'.format(error))
             else:
                 self.reply_with_png(
                     api,
                     smiles,
                     status.id,
-                    status.author.screen_name,
+                    reply_users,
                     descriptor_type='IUPAC名',
                     with_smiles=True)
             print('[BOT] continue streaming...')
 
-        if str(command_prefix.lower()).startswith(self.smiles_prefix):
+        if str(command_prefix.lower()).find(self.smiles_prefix) != -1:
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
@@ -104,11 +107,22 @@ class Listner(tweepy.StreamListener):
                 api,
                 smiles,
                 status.id,
-                status.author.screen_name,
+                reply_users,
                 option_d=option_d)
             print('[BOT] continue streaming...')
 
         return True
+
+    def tweet_mention_formatter(self, screen_names):
+        return ' '.join(['@{0}'.format(x) for x in screen_names])
+
+    def get_mention_users(self, data):
+        """Parse json from Twitter api data.
+
+        Returns:
+            screen_names: list
+        """
+        return [x['screen_name'] for x in data['entities']['user_mentions']]
 
     def parse_tweet_command(self, command):
         """Parse command into SMILES/IUPAC and options.
@@ -126,20 +140,20 @@ class Listner(tweepy.StreamListener):
         option_d = dict([re.split(r': *', x) for x in options])
         return discriptor, option_d
 
-    def reply_iupac_convert_error(self, error, s_id, screen_name):
+    def reply_iupac_convert_error(self, error, s_id, screen_names):
         """Tweet for reply about iupac convert error."""
         print('[BOT] IUPAC conversion error')
-        tweet = '@{0} '.format(screen_name)
+        tweet = self.tweet_mention_formatter(screen_names)
         return self.tweet_error_message(
             tweet + 'すまない。私の化学目録に「{0}」という文字は無かった。'
             .format(error), s_id)
 
     def reply_with_png(self, api, smiles,
-                       s_id, screen_name, option_d=None,
+                       s_id, screen_names, option_d=None,
                        descriptor_type='SMILES', with_smiles=False):
         """Tweet chem graph to user"""
         print('[SMILES]: {0}'.format(smiles))
-        tweet = '@{0}'.format(screen_name)
+        tweet = self.tweet_mention_formatter(screen_names)
 
         if smiles == '':
             tweet += (
