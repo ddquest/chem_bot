@@ -65,12 +65,13 @@ class Listner(tweepy.StreamListener):
         self.hashtag_len = len(self.hashtag)
 
     def on_status(self, status):
-        if str(status.text).startswith(self.iupac_prefix):
+        command_prefix = status.text.split(':')[0]
+        if str(command_prefix.lower()).startswith(self.iupac_prefix):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
             iupac = status.text.split(
-                self.iupac_prefix)[1] \
+                ':')[1] \
                 .lstrip(' ').replace('\n', '').replace('\r', '')
             if self.check_ascii(iupac):
                 smiles, error = chem_bot.util.converter.iupac_to_smiles(
@@ -93,11 +94,11 @@ class Listner(tweepy.StreamListener):
                     with_smiles=True)
             print('[BOT] continue streaming...')
 
-        if str(status.text).startswith(self.smiles_prefix):
+        if str(command_prefix.lower()).startswith(self.smiles_prefix):
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
-            command = status.text.split(self.smiles_prefix)[1].lstrip(' ')
+            command = status.text.split(':')[1].lstrip(' ')
             smiles, option_d = self.parse_tweet_command(command)
             self.reply_with_png(
                 api,
