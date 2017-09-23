@@ -71,6 +71,26 @@ encoder.to_file('edta.png')
 png_binary = encoder.to_png()
 ```
 
+## Flask app
+
+```
+pip install flask
+python app.run
+```
+
+### End point
+
+#### smi2img
+Encode SMILES to PNG image
+- `http://127.0.0.1:5000/api/v1.0/smi2img`
+
+- default parameter
+    - `width=420`
+    - `height=420`
+
+- example
+    - `http://127.0.0.1:5000/api/v1.0/smi2img?smi=BBBBBB&width=420&height=420`
+
 ## Twitter bot(alpha)
 
 Before run the bot, set config files.
