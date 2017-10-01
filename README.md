@@ -75,7 +75,7 @@ png_binary = encoder.to_png()
 
 ```
 pip install flask
-python app.run
+python app.py
 ```
 
 ### End point
