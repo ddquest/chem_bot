@@ -74,7 +74,6 @@ png_binary = encoder.to_png()
 ## Flask app
 
 ```
-pip install flask
 python app.py
 ```
 
@@ -84,9 +83,10 @@ python app.py
 Encode SMILES to PNG image
 - `http://127.0.0.1:5000/api/v1.0/smi2img`
 
-- default parameter
-    - `width=420`
-    - `height=420`
+- parameter
+    - `smi=${SMILES}` require
+    - `width=${INT}` default: 420
+    - `height=${INT}` default: 420
 
 - example
     - `http://127.0.0.1:5000/api/v1.0/smi2img?smi=BBBBBB&width=420&height=420`
