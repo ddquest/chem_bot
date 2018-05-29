@@ -62,14 +62,20 @@ class Listner(tweepy.StreamListener):
         self.smiles_prefix = config.get('general', 'smiles_prefix')
         self.opsin = config.get('general', 'opsin')
         self.hashtag = config.get('general', 'hashtag')
+        self.bot_id = config.get('general', 'bot_id')
         self.hashtag_len = len(self.hashtag)
+        self.iupac_trigger_pattern = re.compile(
+            r'{1}.*{2}'.format(self.bot_id, self.iupac_prefix))
+        self.smiles_trigger_pattern = re.compile(
+            r'{1}.*{2}'.format(self.bot_id, self.smiles_prefix))
 
     def on_status(self, status):
         command_prefix = status.text.split(':')[0]
         reply_users = (
             [status.author.screen_name] +
             self.get_mention_users(status._json))
-        if str(command_prefix.lower()).find(self.iupac_prefix) != -1:
+        if re.search(iupac_trigger_pattern, command_prefix.lower()):
+        #if str(command_prefix.lower()).find(self.iupac_prefix) != -1:
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
@@ -97,7 +103,8 @@ class Listner(tweepy.StreamListener):
                     with_smiles=True)
             print('[BOT] continue streaming...')
 
-        if str(command_prefix.lower()).find(self.smiles_prefix) != -1:
+        if re.search(smiles_trigger_pattern, command_prefix.lower()):
+        #if str(command_prefix.lower()).find(self.smiles_prefix) != -1:
             print(
                 '[CATCH] @{0} >>> {1}'
                 .format(status.author.screen_name, status.text))
