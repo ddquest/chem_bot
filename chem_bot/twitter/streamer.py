@@ -8,6 +8,7 @@ import chem_bot
 
 
 class Streamer(TwythonStreamer):
+
     def __init__(self, api, config):
         super(Streamer, self).__init__(api.app_key, api.app_secret,
                                        api.oauth_token, api.oauth_token_secret)
@@ -35,16 +36,15 @@ class Streamer(TwythonStreamer):
 
         If command not has any options, return (smile/iupac, None)
         """
-        chem_str = re.sub(r' #\w+', '', command)
-        chem_str = re.sub(r'@\w+', '', chem_str)
+        chem_str = re.sub(r'\B([\#\@]\w+\b)', '', command)
         chem_str = chem_str.replace('\n', '').replace('\r', '').strip()
         return chem_str
 
     def reply_iupac_convert_error(self, iupac, id):
         """Tweet for reply about iupac convert error."""
         print('[BOT] IUPAC conversion error')
-        return self.tweet_error_message(
-            'すまない。私の化学目録に「{0}」という文字は無かった。'.format(iupac), id)
+        return self.tweet_error_message(f'すまない。私の化学目録に「{iupac}」という文字は無かった。',
+                                        id)
 
     def reply_with_png(self,
                        smi,
@@ -53,24 +53,22 @@ class Streamer(TwythonStreamer):
                        descriptor_type='SMILES',
                        with_smiles=False):
         """Tweet chem graph to user"""
-        print('[SMILES]: {0}'.format(smi))
+        print(f'[SMILES]: {smi}')
         tweet = ''
 
         if smi == '':
-            tweet += ('{0}を入力し忘れていないか確認してもらえないだろうか。'.format(descriptor_type))
-            return self.tweet_error_message(tweet, id)
+            return self.tweet_error_message(
+                f'{descriptor_type}を入力し忘れていないか確認してもらえないだろうか。', id)
 
         if self.check_ascii(smi):
             encoder = chem_bot.SmilesEncoder(smi)
         else:
-            tweet += ' おや、SMILESに使えない文字が入っているようだ。'
-            return self.tweet_error_message(tweet, id)
+            return self.tweet_error_message(' おや、SMILESに使えない文字が入っているようだ。', id)
 
         if encoder.mol is None:
-            print('Encoding error for [ {0} ]'.format(smi))
-            tweet += (' すまない。この{0}は上手く変換できなかったようだ。'.format(descriptor_type))
-            tweet += '"{0}"'.format(smi)
-            return self.tweet_error_message(tweet, id)
+            print(f'Encoding error for [ {smi} ]')
+            return self.tweet_error_message(
+                f' すまない。この{descriptor_type}は上手く変換できなかったようだ。"{smi}"', id)
 
         png_binary = encoder.to_png()
         image = tempfile.TemporaryFile()
@@ -78,7 +76,7 @@ class Streamer(TwythonStreamer):
         image.seek(0)
 
         if with_smiles:
-            tweet = '{0} "{1}"'.format(tweet, smi)
+            tweet = f'"{smi}"'
 
         try:
             response = self.api.upload_media(media=image)
@@ -135,7 +133,7 @@ class Streamer(TwythonStreamer):
                 iupac=iupac,
                 id=data['id'],
             )
-            return print('[BOT] Error: {0}'.format(error))
+            return print(f'[BOT] Error: {error}')
 
         self.reply_with_png(
             smi=smi,
@@ -146,22 +144,17 @@ class Streamer(TwythonStreamer):
 
     def reply_for_smiles(self, smi, data):
         self.reply_with_png(
-            smi=smi,
-            id=data['id'],
-            descriptor_type='SMILES',
-            with_smiles=True)
+            smi=smi, id=data['id'], descriptor_type='SMILES', with_smiles=True)
         print('[BOT] continue streaming...')
 
     def on_error(self, status_code, data):
-        print(status_code)
+        print(f'Streaming error: {status_code}')
 
     def on_success(self, data):
         if 'text' in data:
             hashtags = data['entities']['hashtags']
             chem_str_type = self.check_hashtags(hashtags)
             text = data['text']
-            # import pprint
-            # pprint.pprint(data, indent=2)
         else:
             return
 

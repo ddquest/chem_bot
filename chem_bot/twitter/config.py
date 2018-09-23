@@ -4,6 +4,7 @@ __CONFIG_FILE__ = '.twitter.toml'
 
 
 class Config(object):
+
     def __init__(self, config_file=__CONFIG_FILE__):
         self.config_file = config_file
 

@@ -6,6 +6,7 @@ from chem_bot import SmilesEncoder
 
 
 class TestSmilesEncoder(object):
+
     @classmethod
     def setup(self):
         self.encoder = SmilesEncoder('c1ccccc1')
