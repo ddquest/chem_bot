@@ -11,8 +11,6 @@ class Config(object):
         with open(self.config_file, 'r') as f:
             data = toml.load(f)
             self.bot_id = data['general']['bot_id']
-            self.iupac_prefix = data['general']['iupac_prefix']
-            self.smiles_prefix = data['general']['smiles_prefix']
             self.opsin = data['general']['opsin']
             self.hashtag = data['general']['hashtag']
             self.consumer_key = data['tokens']['consumer_key']
