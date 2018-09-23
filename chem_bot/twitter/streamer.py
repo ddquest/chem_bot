@@ -30,48 +30,31 @@ class Streamer(TwythonStreamer):
         else:
             return False
 
-    def tweet_mention_formatter(self, screen_name, user_mentions):
-        if len(user_mentions) <= 1:
-            return f'@{screen_name}'
-        else:
-            return ' '.join(
-                ['@{0}'.format(x) for x in user_mentions['screen_name']])
-
-    def get_mention_users(self, data):
-        """Parse json from Twitter api data.
-
-        Returns:
-            screen_names: list
-        """
-        return [x['screen_name'] for x in data['entities']['user_mentions']]
-
     def parse_tweet_command(self, command):
         """Parse command into SMILES/IUPAC and options.
 
         If command not has any options, return (smile/iupac, None)
         """
-        chem_str = re.sub(r'#\w+', '', command)
+        chem_str = re.sub(r' #\w+', '', command)
+        chem_str = re.sub(r'@\w+', '', chem_str)
         chem_str = chem_str.replace('\n', '').replace('\r', '').strip()
         return chem_str
 
-    def reply_iupac_convert_error(self, iupac, id, screen_name, user_mentions):
+    def reply_iupac_convert_error(self, iupac, id):
         """Tweet for reply about iupac convert error."""
         print('[BOT] IUPAC conversion error')
-        tweet = self.tweet_mention_formatter(screen_name, user_mentions)
         return self.tweet_error_message(
-            tweet + 'すまない。私の化学目録に「{0}」という文字は無かった。'.format(iupac), id)
+            'すまない。私の化学目録に「{0}」という文字は無かった。'.format(iupac), id)
 
     def reply_with_png(self,
                        smi,
                        id,
-                       screen_name,
-                       user_mentions,
                        option_d=None,
                        descriptor_type='SMILES',
                        with_smiles=False):
         """Tweet chem graph to user"""
         print('[SMILES]: {0}'.format(smi))
-        tweet = self.tweet_mention_formatter(screen_name, user_mentions)
+        tweet = ''
 
         if smi == '':
             tweet += ('{0}を入力し忘れていないか確認してもらえないだろうか。'.format(descriptor_type))
@@ -151,16 +134,12 @@ class Streamer(TwythonStreamer):
             self.reply_iupac_convert_error(
                 iupac=iupac,
                 id=data['id'],
-                screen_name=data['user']['screen_name'],
-                user_mentions=data['entities']['user_mentions'],
             )
             return print('[BOT] Error: {0}'.format(error))
 
         self.reply_with_png(
             smi=smi,
             id=data['id'],
-            screen_name=data['user']['screen_name'],
-            user_mentions=data['entities']['user_mentions'],
             descriptor_type='IUPAC NAME',
             with_smiles=True)
         print('[BOT] continue streaming...')
@@ -169,8 +148,6 @@ class Streamer(TwythonStreamer):
         self.reply_with_png(
             smi=smi,
             id=data['id'],
-            screen_name=data['user']['screen_name'],
-            user_mentions=data['entities']['user_mentions'],
             descriptor_type='SMILES',
             with_smiles=True)
         print('[BOT] continue streaming...')
