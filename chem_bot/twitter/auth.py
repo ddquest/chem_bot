@@ -19,7 +19,6 @@ def oauth(config):
             config.oauth_token = final_auth['oauth_token']
             config.oauth_token_secret = final_auth['oauth_token_secret']
             config.save()
-            return t
         except TwythonAuthError as e:
             raise RuntimeError(
                 'invalid consumer_key and/or consumer_key_secret')

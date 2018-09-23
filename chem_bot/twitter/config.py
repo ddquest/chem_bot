@@ -25,4 +25,14 @@ class Config(object):
 
     def save(self):
         with open(self.config_file, 'w') as f:
+            self.data['general']['bot_id'] = self.bot_id
+            self.data['general']['opsin'] = self.opsin
+            self.data['general']['hashtag'] = self.hashtag
+            self.data['tokens']['consumer_key'] = self.consumer_key
+            self.data['tokens']['consumer_secret'] = self.consumer_secret
+            self.data['tokens']['oauth_token'] = self.oauth_token
+            self.data['tokens']['oauth_token_secret'] = self.oauth_token_secret
+            self.data['filter']['query'] = self.query
+            self.data['filter']['follow'] = self.filter_follow
+            self.data['filter']['hashtags'] = self.filter_hashtags
             toml.dump(self.data, f)
