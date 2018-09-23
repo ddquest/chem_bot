@@ -2,6 +2,7 @@
 ipynb/
 .envrc
 twitter.config
+.twitter.toml
 java/*.jar
 sandbox/
 test/cover/

@@ -1,0 +1,25 @@
+[general]
+# bot_id
+#  e.g., @souyakuchan
+# bot_id = @souyakuchan
+bot_id = ''
+
+# OPSIN jar
+#  e.g., java/opsin.jar
+opsin = 'java/opsin.jar'
+
+# hashtag
+# hashtag = #souyakuchan_magic
+hashtag = ''
+
+[filter]
+query = 'chem_tes'  # twitter search query (comma sep)
+follow = ''  # user id to follow timeline (comma sep)
+hashtags = 'iupac,smiles'  # fire with these hashtags (comma sep)
+
+[tokens]
+# Twitter apps API tokens and consumer key
+consumer_key = ''
+consumer_secret = ''
+access_token = ''
+access_token_secret = ''
