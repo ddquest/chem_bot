@@ -20,8 +20,10 @@ def oauth(config):
 
     try:
         t = Twython(
-            config.consumer_key, config.consumer_secret,
-            config.access_token, config.access_token_secret,
+            config.consumer_key,
+            config.consumer_secret,
+            config.access_token,
+            config.access_token_secret,
         )
 
         auth = t.get_authentication_tokens()
@@ -29,7 +31,6 @@ def oauth(config):
         print(f'oauth confirmation: {confirme}')
         return t
     except TwythonAuthError as e:
-        raise RuntimeError(
-            'invalid keys')
+        raise RuntimeError('invalid keys')
     except TwythonRateLimitError:
         raise RuntimeError('Reached to API access limit')

@@ -8,11 +8,9 @@ import chem_bot
 
 
 class Streamer(TwythonStreamer):
-
     def __init__(self, api, config):
-        super(Streamer, self).__init__(
-            api.app_key, api.app_secret,
-            api.oauth_token, api.oauth_token_secret)
+        super(Streamer, self).__init__(api.app_key, api.app_secret,
+                                       api.oauth_token, api.oauth_token_secret)
         self.api = api
         self.config = config
         self.opsin = self.config.opsin
@@ -61,20 +59,22 @@ class Streamer(TwythonStreamer):
         print('[BOT] IUPAC conversion error')
         tweet = self.tweet_mention_formatter(screen_name, user_mentions)
         return self.tweet_error_message(
-            tweet + 'すまない。私の化学目録に「{0}」という文字は無かった。'
-            .format(iupac), id)
+            tweet + 'すまない。私の化学目録に「{0}」という文字は無かった。'.format(iupac), id)
 
-    def reply_with_png(self, smi,
-                       id, screen_name, user_mentions, option_d=None,
-                       descriptor_type='SMILES', with_smiles=False):
+    def reply_with_png(self,
+                       smi,
+                       id,
+                       screen_name,
+                       user_mentions,
+                       option_d=None,
+                       descriptor_type='SMILES',
+                       with_smiles=False):
         """Tweet chem graph to user"""
         print('[SMILES]: {0}'.format(smi))
         tweet = self.tweet_mention_formatter(screen_name, user_mentions)
 
         if smi == '':
-            tweet += (
-                '{0}を入力し忘れていないか確認してもらえないだろうか。'
-                .format(descriptor_type))
+            tweet += ('{0}を入力し忘れていないか確認してもらえないだろうか。'.format(descriptor_type))
             return self.tweet_error_message(tweet, id)
 
         if self.check_ascii(smi):
@@ -85,9 +85,7 @@ class Streamer(TwythonStreamer):
 
         if encoder.mol is None:
             print('Encoding error for [ {0} ]'.format(smi))
-            tweet += (
-                ' すまない。この{0}は上手く変換できなかったようだ。'
-                .format(descriptor_type))
+            tweet += (' すまない。この{0}は上手く変換できなかったようだ。'.format(descriptor_type))
             tweet += '"{0}"'.format(smi)
             return self.tweet_error_message(tweet, id)
 
@@ -111,13 +109,12 @@ class Streamer(TwythonStreamer):
         return True
 
     def tweet_error_message(self, tweet, s_id):
-            try:
-                self.api.update_status(
-                    status=self.string_trimmer(tweet),
-                    in_reply_to_status_id=s_id)
-            except TwythonError as e:
-                print('Error: {0}'.format(e))
-            return False
+        try:
+            self.api.update_status(
+                status=self.string_trimmer(tweet), in_reply_to_status_id=s_id)
+        except TwythonError as e:
+            print('Error: {0}'.format(e))
+        return False
 
     def check_ascii(self, smiles):
         """Except multibyte characters in strings."""
@@ -137,9 +134,8 @@ class Streamer(TwythonStreamer):
     def add_hashtag(self, line):
         """Add Twitter hashtag after line."""
         if len(line) + self.reply_hashtag_len + 1 > 140:
-            return (
-                line[:- self.reply_hashtag_len + 4]
-                + '... ' + self.reply_hashtag)
+            return (line[:-self.reply_hashtag_len + 4] + '... ' +
+                    self.reply_hashtag)
         else:
             return line + ' ' + self.reply_hashtag
 
