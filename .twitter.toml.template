@@ -21,5 +21,5 @@ hashtags = 'iupac,smiles'  # fire with these hashtags (comma sep)
 # Twitter apps API tokens and consumer key
 consumer_key = ''
 consumer_secret = ''
-access_token = ''
-access_token_secret = ''
+oauth_token = ''
+oauth_token_secret = ''
