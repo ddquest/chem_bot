@@ -84,15 +84,19 @@ class Streamer(TwythonStreamer):
                 status=self.add_hashtag(tweet),
                 media_ids=[response['media_id']],
                 in_reply_to_status_id=id,
+                auto_populate_reply_metadata=True,
             )
         except Exception as e:
             print(e)
         return True
 
-    def tweet_error_message(self, tweet, s_id):
+    def tweet_error_message(self, tweet, id):
         try:
             self.api.update_status(
-                status=self.string_trimmer(tweet), in_reply_to_status_id=s_id)
+                status=self.string_trimmer(tweet),
+                in_reply_to_status_id=id,
+                auto_populate_reply_metadata=True,
+            )
         except TwythonError as e:
             print('Error: {0}'.format(e))
         return False
