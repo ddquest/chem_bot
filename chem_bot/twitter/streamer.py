@@ -38,6 +38,7 @@ class Streamer(TwythonStreamer):
         """
         chem_str = re.sub(r'\B([\#\@]\w+\b)', '', command)
         chem_str = chem_str.replace('\n', '').replace('\r', '').strip()
+        chem_str = chem_str.strip('"').strip("'")
         return chem_str
 
     def reply_iupac_convert_error(self, iupac, id):
