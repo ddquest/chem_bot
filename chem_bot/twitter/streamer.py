@@ -155,6 +155,9 @@ class Streamer(TwythonStreamer):
         print(f'Streaming error: {status_code}')
 
     def on_success(self, data):
+        if 'retweeted_status' in data:
+            return
+
         if 'text' in data:
             hashtags = data['entities']['hashtags']
             chem_str_type = self.check_hashtags(hashtags)
