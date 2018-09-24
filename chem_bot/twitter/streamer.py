@@ -165,6 +165,11 @@ class Streamer(TwythonStreamer):
         else:
             return
 
+        if 'extended_tweet' in data and 'full_text' in data['extended_tweet']:
+            hashtags = data['extended_tweet']['entities']['hashtags']
+            chem_str_type = self.check_hashtags(hashtags)
+            text = data['extended_tweet']['full_text']
+
         if chem_str_type:
             chem_str = self.parse_tweet_command(text)
         else:
