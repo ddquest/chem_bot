@@ -112,14 +112,14 @@ class Streamer(TwythonStreamer):
 
     def string_trimmer(self, line):
         """Wrap end of strings to under 140 characters."""
-        if len(line) > 140:
-            return line[:137] + '...'
+        if len(line) > 280:
+            return line[:277] + '...'
         else:
             return line
 
     def add_hashtag(self, line):
         """Add Twitter hashtag after line."""
-        if len(line) + self.reply_hashtag_len + 1 > 140:
+        if len(line) + self.reply_hashtag_len + 1 > 280:
             return (line[:-self.reply_hashtag_len + 4] + '... ' +
                     self.reply_hashtag)
         else:
