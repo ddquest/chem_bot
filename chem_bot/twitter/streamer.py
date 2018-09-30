@@ -156,6 +156,7 @@ class Streamer(TwythonStreamer):
         print(f'Streaming error: {status_code}')
 
     def on_success(self, data):
+
         if 'retweeted_status' in data:
             return
 
@@ -176,6 +177,11 @@ class Streamer(TwythonStreamer):
         else:
             print(f'invalid hashtags: {hashtags}, continue...')
             return
+
+        try:
+            self.api = chem_bot.twitter.oauth(self.config)
+        except Exception:
+            traceback.print_exc()
 
         if chem_str_type == 'iupac':
             try:
