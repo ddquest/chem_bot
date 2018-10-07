@@ -10,6 +10,7 @@ from rdkit.Chem.Draw.rdMolDraw2D import MolDraw2DSVG
 
 class SmilesEncoder(object):
     """SmilesEncoder."""
+
     def __init__(self, smiles):
         self.name = 'SmilesEncoder'
         self.smiles = smiles

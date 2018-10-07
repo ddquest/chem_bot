@@ -4,16 +4,20 @@
 bot_id = 
 
 ;iupac_prefix
-;  e.g., %(bot_id)s iupac:
-iupac_prefix = %(bot_id)s iupac:
+;  e.g., iupac
+iupac_prefix = iupac
 
 ;smiles_prefix
-;  e.g., %(bot_id)s smiles:
-smiles_prefix = %(bot_id)s smiles:
+;  e.g., smiles
+smiles_prefix = smiles
 
 ;OPSIN jar
 ; e.g., java/opsin.jar
 opsin = java/opsin.jar
+
+;hashtag
+; e.g., #souyakuchan_magic
+hashtag = 
 
 [tokens]
 ;Twitter apps API tokens and consumer key
