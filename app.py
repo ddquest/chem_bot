@@ -3,7 +3,6 @@ import tempfile
 from flask import Flask, request, send_file
 from chem_bot import SmilesEncoder
 
-
 app = Flask(__name__)
 
 
@@ -34,8 +33,7 @@ def smi2img():
         encoder = SmilesEncoder(smi)
         encoder.to_png(width=int(width), height=int(height))
         encoder.to_file(fp.name)
-        return send_file(fp.name,
-                         mimetype='image/png')
+        return send_file(fp.name, mimetype='image/png')
 
 
 if __name__ == '__main__':
