@@ -14,6 +14,7 @@ class Config(object):
             self.bot_id = data['general']['bot_id']
             self.opsin = data['general']['opsin']
             self.hashtag = data['general']['hashtag']
+            self.viewer_url = data['general']['viewer_url']
             self.consumer_key = data['tokens']['consumer_key']
             self.consumer_secret = data['tokens']['consumer_secret']
             self.oauth_token = data['tokens']['oauth_token']
