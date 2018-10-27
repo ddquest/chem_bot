@@ -7,15 +7,16 @@ bot_id = ''
 # OPSIN jar
 #  e.g., java/opsin.jar
 opsin = 'java/opsin.jar'
+viewer_url = ''
 
 # hashtag
 # hashtag = #souyakuchan_magic
 hashtag = ''
 
 [filter]
-query = 'chem_tes'  # twitter search query (comma sep)
+query = ''  # twitter search query (comma sep)
 follow = ''  # user id to follow timeline (comma sep)
-hashtags = 'iupac,smiles'  # fire with these hashtags (comma sep)
+hashtags = 'iupac,smiles,pdb'  # fire with these hashtags (comma sep)
 
 [tokens]
 # Twitter apps API tokens and consumer key

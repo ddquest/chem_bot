@@ -16,6 +16,7 @@ class Streamer(TwythonStreamer):
         self.config = config
         self.opsin = self.config.opsin
         self.reply_hashtag = self.config.hashtag
+        self.viewer_url = self.config.viewer_url
         self.hashtag_list = self.config.filter_hashtags.strip('.')
         self.reply_hashtag_len = len(self.reply_hashtag)
 
@@ -32,9 +33,9 @@ class Streamer(TwythonStreamer):
             return False
 
     def parse_tweet_command(self, command):
-        """Parse command into SMILES/IUPAC and options.
+        """Parse command into SMILES/IUPAC/PDBID and options.
 
-        If command not has any options, return (smile/iupac, None)
+        If command not has any options, return (SMILES/IUPAC/PDBID, None)
         """
         chem_str = re.sub(r'\B([\#\@]\w+\b)', '', command)
         chem_str = chem_str.replace('\n', '').replace('\r', '').strip()
@@ -91,6 +92,24 @@ class Streamer(TwythonStreamer):
             print(e)
         return True
 
+    def reply_with_viewer_card(self, pdbid, data, with_pdbid=True):
+        """Tweet with molecule viewer twitter card."""
+        print(f'[PDBID]: {pdbid}')
+        tweet = self.viewer_url + '?pdbid=' + pdbid
+
+        if with_pdbid:
+            tweet = tweet + f' #{pdbid}'
+
+        try:
+            self.api.update_status(
+                status=self.add_hashtag(tweet),
+                in_reply_to_status_id=data['id'],
+                auto_populate_reply_metadata=True,
+            )
+        except TwythonError as e:
+            print(f'Error: {e}')
+        return False
+
     def tweet_error_message(self, tweet, id):
         try:
             self.api.update_status(
@@ -99,7 +118,7 @@ class Streamer(TwythonStreamer):
                 auto_populate_reply_metadata=True,
             )
         except TwythonError as e:
-            print('Error: {0}'.format(e))
+            print(f'Error: {e}')
         return False
 
     def check_ascii(self, smiles):
@@ -192,5 +211,11 @@ class Streamer(TwythonStreamer):
         if chem_str_type == 'smiles':
             try:
                 self.reply_for_smiles(chem_str, data)
+            except Exception:
+                traceback.print_exc()
+
+        if chem_str_type == 'pdb':
+            try:
+                self.reply_with_viewer_card(chem_str, data)
             except Exception:
                 traceback.print_exc()
