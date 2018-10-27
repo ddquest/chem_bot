@@ -4,6 +4,7 @@ import os
 
 from rdkit import Chem
 from rdkit.Chem import Draw
+from rdkit.Chem import rdDepictor
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw.rdMolDraw2D import MolDraw2DSVG
 
@@ -23,6 +24,7 @@ class SmilesEncoder(object):
     def to_img(self, encode_type, width=420, height=420):
         """Encode smiles to image"""
         Chem.Kekulize(self.mol)
+        rdDepictor.SetPreferCoordGen(True)
 
         if not self.mol.GetNumConformers():
             AllChem.Compute2DCoords(self.mol)
