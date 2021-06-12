@@ -1,3 +1,3 @@
 #!/bin/sh
 
-wget "https://bitbucket.org/dan2097/opsin/downloads/opsin-2.3.0-jar-with-dependencies.jar" -O "opsin.jar"
+wget "https://github.com/dan2097/opsin/releases/download/2.5.0/opsin-2.5.0-jar-with-dependencies.jar" -O "opsin.jar"
