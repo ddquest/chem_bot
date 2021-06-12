@@ -1,4 +1,4 @@
-FROM kubor/alpine-rdkit:2018.09.1.0
+FROM kubor/alpine-rdkit:2021.03.3
 
 MAINTAINER kubor
 
