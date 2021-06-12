@@ -6,6 +6,7 @@ from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import rdDepictor
 from rdkit.Chem import AllChem
+from rdkit.Chem.Draw import rdMolDraw2D
 from rdkit.Chem.Draw.rdMolDraw2D import MolDraw2DSVG
 
 
@@ -27,12 +28,14 @@ class SmilesEncoder(object):
         rdDepictor.SetPreferCoordGen(True)
 
         if not self.mol.GetNumConformers():
-            AllChem.Compute2DCoords(self.mol)
+            self.mol = Chem.AddHs(self.mol)
+            AllChem.EmbedMolecule(self.mol)
+            self.mol = Chem.RemoveHs(self.mol)
 
         if encode_type == 'svg':
             drawer = MolDraw2DSVG(width, height)
         elif encode_type == 'png':
-            drawer = Draw.MolDraw2DCairo(width, height)
+            drawer = rdMolDraw2D.MolDraw2DCairo(width, height)
 
         drawer.DrawMolecule(self.mol)
         drawer.FinishDrawing()
